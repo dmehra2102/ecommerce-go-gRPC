@@ -1,0 +1,67 @@
+syntax = "proto3";
+package notification;
+option go_package = "./proto/notification;notification";
+
+import "google/protobuf/timestamp.proto";
+
+enum NotificationType {
+    ORDER_CREATED = 0;
+    ORDER_UPDATED = 1;
+    PAYMENT_PROCESSED = 2;
+    PAYMENT_FAILED = 3;
+    PRODUCT_LOW_STOCK = 4;
+    SYSTEM_ALERT = 5;
+}
+
+message Notification {
+    string id = 1;
+    string user_id = 2;
+    NotificationType type = 3;
+    string title = 4;
+    string message = 5;
+    map<string, string> metadata = 6;
+    bool read = 7;
+    google.protobuf.Timestamp created_at = 8;
+}
+
+message SendNotificationRequest {
+    string user_id = 1;
+    NotificationType type = 2;
+    string title = 3;
+    string message = 4;
+    map<string,string> metadata = 5;
+}
+
+message SendNotificationResponse {
+    Notification notification = 1;
+    bool success = 2;
+}
+
+message SubscribeRequest {
+    string user_id = 1;
+    repeated NotificationType types = 2;
+}
+
+message BroadcastNotificationRequest {
+    NotificationType type = 1;
+    string title = 2;
+    string message = 3;
+    map<string, string> metadata = 4;
+}
+
+message BroadcastNotificationResponse {
+    bool success = 1;
+    int32 sent_count = 2;
+}
+
+service NotificationService {
+    // Send notification to a specific user
+    rpc SendNotification(SendNotificationRequest) returns (SendNotificationResponse);
+
+    // Broadcast notification to all users
+    rpc BroadcastNotification(BroadcastNotificationRequest) returns (BroadcastNotificationResponse);
+
+    rpc Subscribe(SubscribeRequest) returns (stream Notification);
+
+    rpc ChatSupport(stream SendNotificationRequest) returns (stream Notification);
+}
