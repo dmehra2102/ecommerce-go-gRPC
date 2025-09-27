@@ -4,6 +4,7 @@ go 1.25.1
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250922171735-9219d122eba9
 	google.golang.org/grpc v1.75.1
 	google.golang.org/protobuf v1.36.9
