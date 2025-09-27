@@ -1,0 +1,84 @@
+syntax = "proto3";
+package payment;
+option go_package = "./proto/payment;payment";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+enum PaymentStatus {
+    PENDING_PAYMENT = 0;
+    PROCESSING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+    REFUNDED = 4;
+}
+
+message Payment {
+    string id = 1;
+    string order_id = 2;
+    string user_id = 3;
+    double amount = 4;
+    string currency = 5;
+    PaymentStatus status = 6;
+    string payment_method = 7;
+    string transaction_id = 8;
+    google.protobuf.Timestamp created_at = 9;
+    google.protobuf.Timestamp updated_at = 10;
+}
+
+message ProcessPaymentRequest {
+    string order_id = 1;
+    string user_id = 2;
+    double amount = 3;
+    string currency = 4;
+    string payment_method = 5;
+    string card_token = 6;
+}
+
+message ProcessPaymentResponse {
+    Payment payment = 1;
+    bool success = 2;
+    string message = 3;
+}
+
+message GetPaymentRequest {
+    string id = 1;
+}
+
+message GetPaymentResponse {
+    Payment payment = 1;
+}
+
+message RefundPaymentRequest {
+    string payment_id = 1;
+    double amount = 2;
+    string reason = 3;
+}
+
+message RefundPaymentResponse {
+    Payment payment = 1;
+    bool success = 2;
+    string message = 3;
+}
+
+service PaymentService {
+    rpc ProcessPayment(ProcessPaymentRequest) returns (ProcessPaymentResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/payments"
+            body: "*"
+        };
+    }
+
+    rpc GetPayment(GetPaymentRequest) returns (GetPaymentResponse) {
+        option (google.api.http) = {
+            get: "/api/v1/payments/{id}"
+        };
+    }
+
+    rpc RefundPayment(RefundPaymentRequest) returns (RefundPaymentResponse) {
+        option (google.api.http) = {
+            post: "/api/v1/payments/{payment_id}/refund"
+            body: "*"
+        };
+    }
+}
