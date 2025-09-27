@@ -1,0 +1,119 @@
+syntax = "proto3";
+package product;
+option go_package = "./proto/product;product";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+message Product {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    double price = 4;
+    int32 stock_quantity = 5;
+    string category = 6;
+    string image_url = 7;
+    google.protobuf.Timestamp created_at = 8;
+    google.protobuf.Timestamp updated_at = 9;
+}
+
+message CreateProductRequest {
+    string name = 1;
+    string description = 2;
+    double price = 3;
+    int32 stock_quantity = 4;
+    string category = 5;
+    string image_url = 6;
+}
+
+message CreateProductResponse {
+    Product product = 1;
+}
+
+message GetProductRequest {
+    string id = 1;
+}
+
+message GetProductResponse {
+    Product product = 1;
+}
+
+message ListProductsRequest {
+    string category = 1;
+    int32 page = 2;
+    int32 page_size = 3;
+    string search = 4;
+}
+
+message ListProductsResponse {
+    repeated Product products = 1;
+    int32 total = 2;
+}
+
+message UpdateProductRequest {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    double price = 4;
+    int32 stock_quantity = 5;
+    string category = 6;
+    string image_url = 7;
+}
+
+message UpdateProductResponse {
+    Product product = 1;
+}
+
+message DeleteProductRequest {
+    string id = 1;
+}
+
+message DeleteProductResponse {
+    bool success = 1;
+}
+
+message BatchUpdateStockRequest {
+    string product_id = 1;
+    int32 quantity_change = 2;
+}
+
+message BatchUpdateStockResponse {
+    bool success = 1;
+    string error = 2;
+}
+
+service ProductService {
+    rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {
+        option (google.api.http) = {
+            post : "/api/v2/products"
+            body : "*"
+        };
+    }
+
+    rpc GetProdut(GetProductRequest) returns (GetProductResponse) {
+        option (google.api.http) = {
+            get : "/api/v1/products/{id}"
+        };
+    }
+
+    rpc ListProducts(ListProductsRequest) returns (ListProductsResponse) {
+        option (google.api.http) = {
+            get : "/api/v1/products"
+        };
+    }
+
+    rpc UpdateProduct(UpdateProductRequest) returns (UpdateProductResponse) {
+        option (google.api.http) = {
+            put : "/api/v1/products/{id}"
+            body : "*"
+        };
+    }
+
+    rpc DeleteProduct(DeleteProductRequest) returns (DeleteProductResponse) {
+        option (google.api.http) = {
+            delete : "/api/v1/products/{id}"
+        };
+    }
+
+    rpc BatchUpdateStock(stream BatchUpdateStockRequest) returns (BatchUpdateStockResponse);
+}
